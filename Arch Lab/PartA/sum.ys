@@ -1,0 +1,43 @@
+#sum.ys
+#Execution begins at address 0
+	.pos 0
+	irmovq stack, %rsp    # set up stack pointer
+	call main             # Execute main program
+	halt				  # Terminate program
+
+
+# Sample linked list
+	.align 8
+ele1:
+	.quad 0x00a
+	.quad ele2
+ele2:
+	.quad 0x0b0
+	.quad ele3
+ele3:
+	.quad 0xc00
+	.quad 0
+
+main:
+	irmovq ele1, %rdi
+	call sum_list         # sum_list(list_ptr ls)
+	ret
+
+sum_list:
+	xorq %rax, %rax       # val = 0
+	jmp loop1             # goto loop1
+
+loop:
+	mrmovq 0(%rdi),%rsi   # get ls->val
+	addq %rsi, %rax       # val += ls->val
+	mrmovq 8(%rdi),%rsi   # get ls->next
+	rrmovq %rsi,%rdi	  # ls = ls->next
+
+loop1:
+	andq %rdi, %rdi       # and $rdi
+	jne loop              # if != 0 goto loop
+	ret
+	
+#Stack starts here and grows to lower addresses
+	.pos 0x200
+stack:
